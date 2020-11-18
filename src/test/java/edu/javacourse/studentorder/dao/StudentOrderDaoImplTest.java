@@ -1,32 +1,43 @@
-package edu.javacourse.studentorder;
+package edu.javacourse.studentorder.dao;
 
-import com.sun.jdi.request.ClassUnloadRequest;
-import edu.javacourse.studentorder.dao.DictionaryDaoImpl;
-import edu.javacourse.studentorder.dao.StudentOrderDao;
-import edu.javacourse.studentorder.dao.StudentOrderDaoImpl;
 import edu.javacourse.studentorder.domain.*;
-import jdk.jshell.execution.LoaderDelegate;
+import edu.javacourse.studentorder.exception.DaoException;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 
-/*
-Этот класс создаёт и сохраняет заявку
----------------------------------------------------------------------------------------------------
- */
-public class SaveStudentOrder {
+import static org.junit.Assert.*;
 
+public class StudentOrderDaoImplTest {
 
+    @BeforeClass
+    public static void startup() throws Exception {
+        DBinit.startUp();
+    }
 
-    /*
-    Вспомогательный метод, который позволяет вернуть студенческую заявку (StudentOrder)
-    ------------------------------------------------------------------------------------------------------
-     */
-    static StudentOrder buildStudentOrder(long id) {
+    @Test
+    public void saveStudentOrder() throws DaoException {
+        StudentOrder so = buildStudentOrder(10);
+        Long id = new StudentOrderDaoImpl().saveStudentOrder(so);
+    }
+
+    @Test (expected = DaoException.class)
+    public void saveStudentOrderError() throws DaoException {
+            StudentOrder so = buildStudentOrder(10);
+            so.getHusband().setSurName(null);
+            Long id = new StudentOrderDaoImpl().saveStudentOrder(so);
+    }
+
+    @Test
+    public void getStudentOrders() throws DaoException {
+        List<StudentOrder> list = new StudentOrderDaoImpl().getStudentOrders();
+
+    }
+
+   public StudentOrder buildStudentOrder(long id) {
         StudentOrder so = new StudentOrder();
         so.setStudentOrderId(id);
         so.setMarriageCertificateID("" + (123456000 + id));
